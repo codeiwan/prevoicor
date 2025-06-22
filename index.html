@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>whiscribe - Audio Labeling Studio</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script defer src="script.js"></script>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- 📁 작업 전 사이드 패널 -->
+  <div class="sidebar">
+    <h5 class="text-light mb-4">📁 Session Setup</h5>
+
+    <div class="mb-3">
+      <label class="form-label text-light">Audio File</label>
+      <input type="file" class="form-control" accept="audio/*">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label text-light">Load JSON (optional)</label>
+      <input type="file" class="form-control" accept=".json">
+    </div>
+
+    <hr class="text-secondary" />
+
+    <h6 class="text-light">📝 Segments</h6>
+    <div class="segment-list">
+      <div class="segment-item">Segment 1 — 00:02 ~ 00:05</div>
+      <div class="segment-item">Segment 2 — 00:06 ~ 00:09</div>
+    </div>
+
+    <div class="mt-4 text-center">
+      <button class="btn btn-sm btn-outline-light w-100">⏏ Export JSON</button>
+    </div>
+  </div>
+
+  <!-- 🎛 메인 작업 테이블 -->
+  <div class="main-content">
+
+    <h4 class="mb-3">🎧 Audio Labeling Workspace</h4>
+
+    <div class="waveform-container">
+      [ Waveform Visualization Placeholder ]
+    </div>
+
+    <div class="segment-controls mb-3">
+      <div class="text-secondary">⏱ Select time range using mouse</div>
+      <div>
+        <button class="btn btn-sm btn-outline-light">▶ Play Segment</button>
+        <button class="btn btn-sm btn-outline-success">➕ Add Segment</button>
+      </div>
+    </div>
+
+    <div class="transcription-box">
+      <label class="form-label">Transcription for Active Segment</label>
+      <textarea class="form-control" rows="3" placeholder="Type or edit transcription here..."></textarea>
+    </div>
+
+    <div class="footer mt-4">
+      <button class="btn btn-primary">💾 Save Segment</button>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
