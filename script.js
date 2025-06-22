@@ -11,6 +11,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const playSegmentBtn = document.getElementById("play-segment-btn");
   const segmentList = document.querySelector(".segment-list");
   const transcriptBox = document.querySelector("textarea");
+  const speakerInput = document.getElementById("speaker-input");
   const transcriptionBox = document.querySelector(".transcription-box");
   const closeTranscriptionBtn = document.getElementById("close-transcription");
 
@@ -75,6 +76,7 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
     transcriptBox.value = "";
+    speakerInput.value = "";
     selectedSegmentId = null;
     clearSelectedClass();
     updateButtonVisibility(true); // UI 전환
@@ -87,6 +89,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const start = Math.round(activeRegion.start * 100) / 100;
     const end = Math.round(activeRegion.end * 100) / 100;
     const transcript = transcriptBox.value.trim();
+    const speaker = speakerInput.value.trim();
 
     if (selectedSegmentId) {
       // ✅ 기존 segment 수정
@@ -95,6 +98,7 @@ window.addEventListener("DOMContentLoaded", () => {
         existing.start = start;
         existing.end = end;
         existing.text = transcript;
+        existing.speaker = speaker;
 
         // 리스트 항목 업데이트
         const listItem = document.querySelector(`.segment-item[data-id="${selectedSegmentId}"]`);
@@ -108,6 +112,7 @@ window.addEventListener("DOMContentLoaded", () => {
         }
 
         transcriptBox.value = "";
+        speakerInput.value = "";
         selectedSegmentId = null;
         clearSelectedClass();
         updateButtonVisibility(false);
@@ -119,7 +124,8 @@ window.addEventListener("DOMContentLoaded", () => {
         id: segmentId,
         start,
         end,
-        text: transcript
+        text: transcript,
+        speaker: speaker
       };
       savedRegions.push(segmentData);
 
@@ -143,6 +149,7 @@ window.addEventListener("DOMContentLoaded", () => {
           activeRegion = null;
         }
         transcriptBox.value = "";
+        speakerInput.value = "";
         selectedSegmentId = null;
         clearSelectedClass();
         updateButtonVisibility(false);
@@ -161,6 +168,7 @@ window.addEventListener("DOMContentLoaded", () => {
             color: "rgba(0, 255, 0, 0.3)"
           });
           transcriptBox.value = regionData.text || "";
+          speakerInput.value = regionData.speaker || "";
           updateButtonVisibility(true);
         }
       });
@@ -171,6 +179,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
       regionCount++;
       transcriptBox.value = "";
+      speakerInput.value = "";
       if (activeRegion) {
         activeRegion.remove();
         activeRegion = null;
@@ -199,6 +208,7 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
     transcriptBox.value = seg.text;
+    speakerInput.value = seg.speaker || "";
     selectedSegmentId = id;
 
     clearSelectedClass();
@@ -214,6 +224,7 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     transcriptBox.value = "";
+    speakerInput.value = "";
     selectedSegmentId = null;
     clearSelectedClass();
     updateButtonVisibility(false);
@@ -245,7 +256,7 @@ window.addEventListener("DOMContentLoaded", () => {
       segments: savedRegions.map(seg => ({
         start: seg.start,
         end: seg.end,
-        speaker: "",
+        speaker: seg.speaker || "",
         text: seg.text
       }))
     };
