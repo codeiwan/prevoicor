@@ -79,6 +79,11 @@ body {
   border-radius: 6px;
 }
 
+#close-transcription {
+  padding: 0 8px;
+  line-height: 1;
+}
+
 .footer {
   margin-top: auto;
   text-align: right;

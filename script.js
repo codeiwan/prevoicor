@@ -6,10 +6,32 @@ const savedRegions = [];
 
 window.addEventListener("DOMContentLoaded", () => {
   const audioInput = document.querySelector('input[type="file"][accept^="audio"]');
-  const addSegmentBtn = document.querySelector("button.btn-outline-success");
-  const saveSegmentBtn = document.querySelector("button.btn-primary");
+  const addSegmentBtn = document.getElementById("add-segment-btn");
+  const saveSegmentBtn = document.getElementById("save-segment-btn");
+  const playSegmentBtn = document.getElementById("play-segment-btn");
   const segmentList = document.querySelector(".segment-list");
   const transcriptBox = document.querySelector("textarea");
+  const transcriptionBox = document.querySelector(".transcription-box");
+  const closeTranscriptionBtn = document.getElementById("close-transcription");
+
+  // 상태 초기화 함수
+  function updateButtonVisibility(regionActive) {
+    if (!addSegmentBtn || !saveSegmentBtn || !playSegmentBtn || !transcriptionBox) return;
+    
+    if (regionActive) {
+      addSegmentBtn.style.display = "none";
+      saveSegmentBtn.style.display = "inline-block";
+      playSegmentBtn.style.display = "inline-block";
+      transcriptionBox.style.display = "block";
+    } else {
+      addSegmentBtn.style.display = "inline-block";
+      saveSegmentBtn.style.display = "none";
+      playSegmentBtn.style.display = "none";
+      transcriptionBox.style.display = "none";
+    }
+  }
+
+  updateButtonVisibility(false); // 처음에는 숨겨둠
 
   // 오디오 업로드
   audioInput.addEventListener("change", (e) => {
@@ -38,7 +60,7 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Add Segment → region만 생성
+  // Add Segment → region 생성 + UI 전환
   addSegmentBtn.addEventListener("click", () => {
     if (!wavesurfer) return;
 
@@ -53,11 +75,12 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
     transcriptBox.value = "";
-    selectedSegmentId = null; // 새로 만드는 거니까 기존 선택 해제
-    clearSelectedClass();     // 시각적 강조도 해제
+    selectedSegmentId = null;
+    clearSelectedClass();
+    updateButtonVisibility(true); // UI 전환
   });
 
-  // Save Segment → 새로 추가 또는 기존 수정
+  // Save Segment → 수정 or 새로 추가
   saveSegmentBtn.addEventListener("click", () => {
     if (!activeRegion) return;
 
@@ -66,21 +89,20 @@ window.addEventListener("DOMContentLoaded", () => {
     const text = transcriptBox.value.trim();
 
     if (selectedSegmentId) {
-      // ✅ 수정 모드
+      // 수정
       const seg = savedRegions.find(r => r.id === selectedSegmentId);
       if (seg) {
         seg.start = parseFloat(start);
         seg.end = parseFloat(end);
         seg.text = text;
 
-        // 화면 텍스트도 업데이트
         const existingItem = segmentList.querySelector(`[data-id="${selectedSegmentId}"]`);
         if (existingItem) {
           existingItem.textContent = `Segment ${seg.id.replace("segment-", "")} — ${start}s ~ ${end}s`;
         }
       }
     } else {
-      // ✅ 새로 추가
+      // 추가
       const segmentId = `segment-${regionCount}`;
       const item = document.createElement("div");
       item.className = "segment-item";
@@ -103,9 +125,10 @@ window.addEventListener("DOMContentLoaded", () => {
     transcriptBox.value = "";
     selectedSegmentId = null;
     clearSelectedClass();
+    updateButtonVisibility(false); // UI 복원
   });
 
-  // Segment 클릭 시 → region 복원 + 텍스트 표시 + 강조
+  // Segment 항목 클릭 시 region 재생성 + UI 전환
   segmentList.addEventListener("click", (e) => {
     const item = e.target.closest(".segment-item");
     if (!item) return;
@@ -128,10 +151,30 @@ window.addEventListener("DOMContentLoaded", () => {
     selectedSegmentId = id;
 
     clearSelectedClass();
-    item.classList.add("selected"); // ✅ 시각적 강조
+    item.classList.add("selected");
+    updateButtonVisibility(true); // UI 전환
   });
 
-  // helper: 이전 선택 해제
+  // ❌ 닫기 버튼 → region 제거 + UI 복원
+  closeTranscriptionBtn.addEventListener("click", () => {
+    if (activeRegion) {
+      activeRegion.remove();
+      activeRegion = null;
+    }
+
+    transcriptBox.value = "";
+    selectedSegmentId = null;
+    clearSelectedClass();
+    updateButtonVisibility(false);
+  });
+
+  // Play Segment 버튼 → region 재생
+  playSegmentBtn.addEventListener("click", () => {
+    if (activeRegion && wavesurfer) {
+      wavesurfer.play(activeRegion.start, activeRegion.end);
+    }
+  });
+
   function clearSelectedClass() {
     segmentList.querySelectorAll(".segment-item.selected").forEach(el => {
       el.classList.remove("selected");

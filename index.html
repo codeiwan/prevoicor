@@ -14,34 +14,33 @@
 
 <div class="layout">
 
-  <!-- 📁 작업 전 사이드 패널 -->
+  <!-- 📁 사이드바 -->
   <div class="sidebar">
     <h5 class="text-light mb-4">📁 Session Setup</h5>
 
     <div class="mb-3">
       <label class="form-label text-light">Audio File</label>
-      <input type="file" class="form-control" accept="audio/*">
+      <input type="file" class="form-control" id="audio-upload" accept="audio/*">
     </div>
 
     <div class="mb-3">
       <label class="form-label text-light">Load JSON (optional)</label>
-      <input type="file" class="form-control" accept=".json">
+      <input type="file" class="form-control" id="json-upload" accept=".json">
     </div>
 
     <hr class="text-secondary" />
 
     <h6 class="text-light">📝 Segments</h6>
-    <div class="segment-list">
-      <div class="segment-item">Segment 1 — 00:02 ~ 00:05</div>
-      <div class="segment-item">Segment 2 — 00:06 ~ 00:09</div>
+    <div class="segment-list" id="segment-list">
+      <!-- 동적으로 세그먼트 항목이 추가될 예정 -->
     </div>
 
     <div class="mt-4 text-center">
-      <button class="btn btn-sm btn-outline-light w-100">⏏ Export JSON</button>
+      <button class="btn btn-sm btn-outline-light w-100" id="export-json">⏏ Export JSON</button>
     </div>
   </div>
 
-  <!-- 🎛 메인 작업 테이블 -->
+  <!-- 🎛 메인 작업 영역 -->
   <div class="main-content">
 
     <h4 class="mb-3">🎧 Audio Labeling Workspace</h4>
@@ -53,18 +52,21 @@
     <div class="segment-controls mb-3">
       <div class="text-secondary">⏱ Select time range using mouse</div>
       <div>
-        <button class="btn btn-sm btn-outline-light">▶ Play Segment</button>
-        <button class="btn btn-sm btn-outline-success">➕ Add Segment</button>
+        <button class="btn btn-sm btn-outline-light" id="play-segment-btn" style="display: none;">▶ Play Segment</button>
+        <button class="btn btn-sm btn-outline-success" id="add-segment-btn">➕ Add Segment</button>
       </div>
     </div>
 
-    <div class="transcription-box">
-      <label class="form-label">Transcription for Active Segment</label>
-      <textarea class="form-control" rows="3" placeholder="Type or edit transcription here..."></textarea>
+    <div class="transcription-box" id="transcription-box" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <label class="form-label">Transcription for Active Segment</label>
+        <button id="close-transcription" class="btn btn-sm btn-outline-danger">✕</button>
+      </div>
+      <textarea class="form-control" id="transcription-textarea" rows="3" placeholder="Type or edit transcription here..."></textarea>
     </div>
 
     <div class="footer mt-4">
-      <button class="btn btn-primary">💾 Save Segment</button>
+      <button class="btn btn-primary" id="save-segment-btn" style="display: none;">💾 Save Segment</button>
     </div>
 
   </div>
