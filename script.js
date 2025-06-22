@@ -231,4 +231,35 @@ window.addEventListener("DOMContentLoaded", () => {
       el.classList.remove("selected");
     });
   }
+
+  // Export JSON 버튼 기능
+  const exportJsonBtn = document.getElementById("export-json");
+
+  exportJsonBtn.addEventListener("click", () => {
+    const data = {
+      metadata: {
+        filename: audioInput.files[0]?.name || "unknown_audio.wav",
+        language: "ko-KR",
+        created: "1900-01-01T12:59:59"  // 예시용 날짜
+      },
+      segments: savedRegions.map(seg => ({
+        start: seg.start,
+        end: seg.end,
+        speaker: "",
+        text: seg.text
+      }))
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "exported_segments.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
+  });
 });
