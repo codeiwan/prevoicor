@@ -64,6 +64,11 @@ body {
   color: #ddd;
 }
 
+.segment-item.selected {
+  background-color: #4caf50;
+  color: #000;
+}
+
 .segment-item:hover {
   background-color: #3a3a3a;
 }
