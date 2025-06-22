@@ -28,12 +28,18 @@ body {
   background-color: #333;
   border-radius: 8px;
   height: 280px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   margin-bottom: 1.5rem;
-  color: #aaa;
-  font-style: italic;
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+}
+
+#waveform {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 
 .segment-controls {
