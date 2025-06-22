@@ -17,7 +17,7 @@ window.addEventListener("DOMContentLoaded", () => {
   // 상태 초기화 함수
   function updateButtonVisibility(regionActive) {
     if (!addSegmentBtn || !saveSegmentBtn || !playSegmentBtn || !transcriptionBox) return;
-    
+
     if (regionActive) {
       addSegmentBtn.style.display = "none";
       saveSegmentBtn.style.display = "inline-block";
@@ -84,48 +84,99 @@ window.addEventListener("DOMContentLoaded", () => {
   saveSegmentBtn.addEventListener("click", () => {
     if (!activeRegion) return;
 
-    const start = activeRegion.start.toFixed(2);
-    const end = activeRegion.end.toFixed(2);
-    const text = transcriptBox.value.trim();
+    const start = Math.round(activeRegion.start * 100) / 100;
+    const end = Math.round(activeRegion.end * 100) / 100;
+    const transcript = transcriptBox.value.trim();
 
     if (selectedSegmentId) {
-      // 수정
-      const seg = savedRegions.find(r => r.id === selectedSegmentId);
-      if (seg) {
-        seg.start = parseFloat(start);
-        seg.end = parseFloat(end);
-        seg.text = text;
+      // ✅ 기존 segment 수정
+      const existing = savedRegions.find(r => r.id === selectedSegmentId);
+      if (existing) {
+        existing.start = start;
+        existing.end = end;
+        existing.text = transcript;
 
-        const existingItem = segmentList.querySelector(`[data-id="${selectedSegmentId}"]`);
-        if (existingItem) {
-          existingItem.textContent = `Segment ${seg.id.replace("segment-", "")} — ${start}s ~ ${end}s`;
+        // 리스트 항목 업데이트
+        const listItem = document.querySelector(`.segment-item[data-id="${selectedSegmentId}"]`);
+        if (listItem) {
+          listItem.querySelector("span").textContent = `Segment ${existing.id.split("-")[1]} — ${start}s ~ ${end}s`;
         }
+
+        if (activeRegion) {
+          activeRegion.remove();
+          activeRegion = null;
+        }
+
+        transcriptBox.value = "";
+        selectedSegmentId = null;
+        clearSelectedClass();
+        updateButtonVisibility(false);
       }
     } else {
-      // 추가
+      // ✅ 새 segment 추가
       const segmentId = `segment-${regionCount}`;
+      const segmentData = {
+        id: segmentId,
+        start,
+        end,
+        text: transcript
+      };
+      savedRegions.push(segmentData);
+
       const item = document.createElement("div");
       item.className = "segment-item";
-      item.textContent = `Segment ${regionCount} — ${start}s ~ ${end}s`;
       item.dataset.id = segmentId;
-      segmentList.appendChild(item);
 
-      savedRegions.push({
-        id: segmentId,
-        start: parseFloat(start),
-        end: parseFloat(end),
-        text: text
+      const label = document.createElement("span");
+      label.textContent = `Segment ${regionCount} — ${start}s ~ ${end}s`;
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.textContent = "❌";
+      deleteBtn.className = "delete-btn";
+      deleteBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const idx = savedRegions.findIndex(r => r.id === segmentId);
+        if (idx !== -1) savedRegions.splice(idx, 1);
+        item.remove();
+        if (activeRegion) {
+          activeRegion.remove();
+          activeRegion = null;
+        }
+        transcriptBox.value = "";
+        selectedSegmentId = null;
+        clearSelectedClass();
+        updateButtonVisibility(false);
       });
 
-      regionCount++;
-    }
+      item.addEventListener("click", () => {
+        clearSelectedClass();
+        item.classList.add("selected");
+        selectedSegmentId = segmentId;
+        const regionData = savedRegions.find(r => r.id === segmentId);
+        if (regionData) {
+          if (activeRegion) activeRegion.remove();
+          activeRegion = wavesurfer.addRegion({
+            start: regionData.start,
+            end: regionData.end,
+            color: "rgba(0, 255, 0, 0.3)"
+          });
+          transcriptBox.value = regionData.text || "";
+          updateButtonVisibility(true);
+        }
+      });
 
-    activeRegion.remove();
-    activeRegion = null;
-    transcriptBox.value = "";
-    selectedSegmentId = null;
-    clearSelectedClass();
-    updateButtonVisibility(false); // UI 복원
+      item.appendChild(label);
+      item.appendChild(deleteBtn);
+      segmentList.appendChild(item);
+
+      regionCount++;
+      transcriptBox.value = "";
+      if (activeRegion) {
+        activeRegion.remove();
+        activeRegion = null;
+      }
+      updateButtonVisibility(false);
+    }
   });
 
   // Segment 항목 클릭 시 region 재생성 + UI 전환

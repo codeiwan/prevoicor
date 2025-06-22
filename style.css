@@ -58,10 +58,14 @@ body {
 }
 
 .segment-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 0.5rem 0.75rem;
   border-bottom: 1px solid #444;
   cursor: pointer;
   color: #ddd;
+  position: relative;
 }
 
 .segment-item.selected {
@@ -102,4 +106,18 @@ button, input, textarea {
 
 .form-control::placeholder {
   color: #aaa;
+}
+
+.delete-btn {
+  background: transparent;
+  border: none;
+  color: #f44336;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-left: 12px;
+  flex-shrink: 0;
+}
+
+.delete-btn:hover {
+  color: #ff7961;
 }
